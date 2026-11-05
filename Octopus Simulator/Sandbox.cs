@@ -20,7 +20,6 @@ namespace OctopusSimulator
         private void StartNewRun()
         {
             _octopus = new Octopus(StartRow, StartColumn, StartSpeed);
-            Console.WriteLine(_octopus);
             _turnCounter = 0;
         }
     }
