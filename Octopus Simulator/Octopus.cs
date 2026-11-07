@@ -11,7 +11,6 @@ namespace OctopusSimulator
             Row = row;
             Column = column;
             Speed = speed;
-            Console.WriteLine("Octopus Data " + row + column + speed);
         }
 
         public void MoveTo(int row, int column)
