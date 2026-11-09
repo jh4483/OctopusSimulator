@@ -9,4 +9,5 @@ namespace OctopusSimulator
         SpeedUp,
         SpeedDown
     }
+
 }

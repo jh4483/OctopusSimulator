@@ -8,6 +8,10 @@ namespace OctopusSimulator
         private const int StartColumn = 0;
         private const int StartSpeed = 5;
 
+        private const int MinSpeed = 0;
+        private const int MaxSpeed = 30;
+        private const int StepSpeed = 5;
+
         private (int Row, int Column) _drawerPosition = (3, 10);
         private int _turnCounter = 0;
         private Octopus _octopus = null!;
@@ -28,44 +32,59 @@ namespace OctopusSimulator
             _turnCounter = 0;
         }
 
-        public bool TakeStep(OctopusActions action)
+        public StepOutcome TakeStep(OctopusActions action)
         {
             _turnCounter++;
-
-            int newRow = _octopus.Row;
-            int newColumn = _octopus.Column;
 
             switch (action)
             {
                 case OctopusActions.MoveUp:
-                    newRow--;
-                    break;
+                    return TryMove(-1, 0);
                 case OctopusActions.MoveDown:
-                    newRow++;
-                    break;
+                    return TryMove(1, 0);
                 case OctopusActions.MoveLeft:
-                    newColumn--;
-                    break;
+                    return TryMove(0, -1);
                 case OctopusActions.MoveRight:
-                    newColumn++;
-                    break;
+                    return TryMove(0, 1);
+                case OctopusActions.SpeedUp:
+                    return ChangeSpeed(StepSpeed);
+                case OctopusActions.SpeedDown:
+                    return ChangeSpeed(-StepSpeed);
                 default:
-                    return false;
+                    return StepOutcome.ActionNotSupported;
             }
+        }
+
+        private StepOutcome TryMove(int rowChange, int columnChange)
+        {
+            if (_octopus.Speed == 0)
+            {
+                return StepOutcome.SpeedIsZero;
+            }
+
+            int newRow = _octopus.Row + rowChange;
+            int newColumn = _octopus.Column + columnChange;
 
             if (!IsInsideRoom(newRow, newColumn))
             {
-                return false;
+                return StepOutcome.BlockedByWall;
             }
 
             _octopus.MoveTo(newRow, newColumn);
-            return true;
+            return StepOutcome.Moved;
         }
 
-        private static bool IsInsideRoom(int row, int column)
+        private StepOutcome ChangeSpeed(int change)
         {
-            return row >= 0 && row < NumberOfRows
-                && column >= 0 && column < NumberOfColumns;
+            int newSpeed = _octopus.Speed + change;
+
+            if (newSpeed < MinSpeed || newSpeed > MaxSpeed)
+            {
+                return StepOutcome.SpeedLimitReached;
+            }
+
+            _octopus.SetSpeed(newSpeed);
+            return StepOutcome.SpeedChanged;
         }
     }
 }
