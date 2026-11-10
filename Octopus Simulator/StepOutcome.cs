@@ -7,6 +7,9 @@ namespace OctopusSimulator
         SpeedIsZero,
         SpeedChanged,
         SpeedLimitReached,
+        DrawerHitTooSoftly,
+        DrawerBroken,
+        OutOfTurns,
         ActionNotSupported
     }
 }

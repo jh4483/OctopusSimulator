@@ -14,9 +14,7 @@
 
         private static void TryAction(Sandbox sandbox, OctopusActions action)
         {
-            bool moved = sandbox.TakeStep(action);
-            Console.WriteLine($"{action}: {(moved ? "moved" : "blocked")}");
-            Console.WriteLine($"Row: {sandbox.OctopusRow}, Column: {sandbox.OctopusColumn}, Speed: {sandbox.OctopusSpeed}, Turn: {sandbox.TurnCount}");
+            
         }
     }
 }
