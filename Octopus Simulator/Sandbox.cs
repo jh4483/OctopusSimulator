@@ -12,54 +12,59 @@ namespace OctopusSimulator
         private const int MaxSpeed = 30;
         private const int StepSpeed = 5;
 
+        private const int DrawerBreakSpeed = 20;
+        private const int MaxTurns = 100;
+
         private (int Row, int Column) _drawerPosition = (3, 10);
         private int _turnCounter = 0;
+        private bool _isDrawerBroken = false;
         private Octopus _octopus = null!;
 
         public int OctopusRow => _octopus.Row;
         public int OctopusColumn => _octopus.Column;
         public int OctopusSpeed => _octopus.Speed;
         public int TurnCount => _turnCounter;
-
-        public bool HasDrawerBroken = false;
+        public bool IsDrawerBroken => _isDrawerBroken;
+        public bool IsRunOver => _isDrawerBroken || _turnCounter >= MaxTurns;
 
         public Sandbox()
         {
             StartNewRun();
         }
 
-        private void StartNewRun()
+        public void StartNewRun()
         {
             _octopus = new Octopus(StartRow, StartColumn, StartSpeed);
             _turnCounter = 0;
-            HasDrawerBroken = false;
+            _isDrawerBroken = false;
         }
 
         public StepOutcome TakeStep(OctopusActions action)
         {
-            if(_turnCounter < 100 && !HasDrawerBroken)
+            if (IsRunOver)
             {
-                _turnCounter++;
-
-                switch (action)
-                {
-                    case OctopusActions.MoveUp:
-                        return TryMove(-1, 0);
-                    case OctopusActions.MoveDown:
-                        return TryMove(1, 0);
-                    case OctopusActions.MoveLeft:
-                        return TryMove(0, -1);
-                    case OctopusActions.MoveRight:
-                        return TryMove(0, 1);
-                    case OctopusActions.SpeedUp:
-                        return ChangeSpeed(StepSpeed);
-                    case OctopusActions.SpeedDown:
-                        return ChangeSpeed(-StepSpeed);
-                    default:
-                        return StepOutcome.ActionNotSupported;
-                }
+                return StepOutcome.RunAlreadyOver;
             }
-            else return StepOutcome.OutOfTurns;
+
+            _turnCounter++;
+
+            switch (action)
+            {
+                case OctopusActions.MoveUp:
+                    return TryMove(-1, 0);
+                case OctopusActions.MoveDown:
+                    return TryMove(1, 0);
+                case OctopusActions.MoveLeft:
+                    return TryMove(0, -1);
+                case OctopusActions.MoveRight:
+                    return TryMove(0, 1);
+                case OctopusActions.SpeedUp:
+                    return ChangeSpeed(StepSpeed);
+                case OctopusActions.SpeedDown:
+                    return ChangeSpeed(-StepSpeed);
+                default:
+                    return StepOutcome.ActionNotSupported;
+            }
         }
 
         private StepOutcome TryMove(int rowChange, int columnChange)
@@ -67,7 +72,6 @@ namespace OctopusSimulator
             if (_octopus.Speed == 0)
             {
                 return StepOutcome.SpeedIsZero;
-                Console.WriteLine("Octopus is at 0 speed.")
             }
 
             int newRow = _octopus.Row + rowChange;
@@ -75,21 +79,23 @@ namespace OctopusSimulator
 
             if (!IsInsideRoom(newRow, newColumn))
             {
+                _octopus.SetSpeed(StartSpeed);
                 return StepOutcome.BlockedByWall;
-                Console.WriteLine("Octopus has been hit by a wall")
             }
 
-            if(_octopus.Speed >= 20 && newRow == _drawerPosition.Row && newColumn == _drawerPosition.Column)
-            {
-                HasDrawerBroken = true;
-                return StepOutcome.DrawerBroken;
-                Console.WriteLine("Octopus has broken the drawer")
-            }
+            bool isDrawerCell = newRow == _drawerPosition.Row
+                && newColumn == _drawerPosition.Column;
 
-            if(_octopus.Speed < 20 && newRow == _drawerPosition.Row && newColumn == _drawerPosition.Column)
+            if (isDrawerCell)
             {
+                if (_octopus.Speed >= DrawerBreakSpeed)
+                {
+                    _isDrawerBroken = true;
+                    return StepOutcome.DrawerBroken;
+                }
+
+                _octopus.SetSpeed(StartSpeed);
                 return StepOutcome.DrawerHitTooSoftly;
-                Console.WriteLine("Octopus hit the drawer too softly")
             }
 
             _octopus.MoveTo(newRow, newColumn);
@@ -109,14 +115,10 @@ namespace OctopusSimulator
             return StepOutcome.SpeedChanged;
         }
 
-        private bool IsInsideRoom(int row, int column)
+        private static bool IsInsideRoom(int row, int column)
         {
-            if(row >=0 && row <=9 && column >= 0 && column <= 19)
-            {
-                return true;
-            }
-
-            return false;
+            return row >= 0 && row < NumberOfRows
+                && column >= 0 && column < NumberOfColumns;
         }
     }
 }
