@@ -10,6 +10,7 @@ namespace OctopusSimulator
         DrawerHitTooSoftly,
         DrawerBroken,
         OutOfTurns,
+        RunAlreadyOver,
         ActionNotSupported
     }
 }
