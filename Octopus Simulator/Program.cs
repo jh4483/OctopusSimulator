@@ -5,6 +5,7 @@
         public static void Main()
         {
             Sandbox sandbox = new Sandbox();
+            Display.Render(sandbox);
 
             for (int i = 0; i < 3; i++) Try(sandbox, OctopusActions.MoveDown);
             for (int i = 0; i < 9; i++) Try(sandbox, OctopusActions.MoveRight);

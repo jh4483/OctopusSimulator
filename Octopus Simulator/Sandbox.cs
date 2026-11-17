@@ -2,8 +2,8 @@ namespace OctopusSimulator
 {
     public class Sandbox
     {
-        private const int NumberOfRows = 10;
-        private const int NumberOfColumns = 20;
+        public const int NumberOfRows = 10;
+        public const int NumberOfColumns = 20;
         private const int StartRow = 0;
         private const int StartColumn = 0;
         private const int StartSpeed = 5;
@@ -26,6 +26,8 @@ namespace OctopusSimulator
         public int TurnCount => _turnCounter;
         public bool IsDrawerBroken => _isDrawerBroken;
         public bool IsRunOver => _isDrawerBroken || _turnCounter >= MaxTurns;
+        public int DrawerRow => _drawerPosition.Row;
+        public int DrawerColumn => _drawerPosition.Column;
 
         public Sandbox()
         {
